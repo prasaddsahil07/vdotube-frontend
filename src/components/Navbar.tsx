@@ -84,7 +84,7 @@ function Navbar() {
                 <SheetContent side={"left"} className="w-60">
                   <SheetHeader>
                     <SheetTitle className="pt-4 underline mb-8">
-                      Welcome to Vidloom
+                      Welcome to VdoTube
                     </SheetTitle>
                   </SheetHeader>
 
@@ -138,7 +138,7 @@ function Navbar() {
                 <Clapperboard />
 
                 <h1 className="font-semibold  text-2xl text-foreground">
-                  Vidloom
+                  VdoTube
                 </h1>
               </div>
             </Link>

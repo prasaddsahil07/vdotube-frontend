@@ -86,6 +86,7 @@ export default function RegsiterPage() {
 
         const response = await fetch(process.env.url + "/users/register", {
             method: "POST",
+            credentials: 'include',
             body: formData,
         });
 
@@ -123,7 +124,7 @@ export default function RegsiterPage() {
                     </h3>
                     <p className="text-base text-muted-foreground mt-1 flex items-center gap-2">
                         <User className="w-4 h-4 text-blue-400" />
-                        Join Vidloom and start sharing your story
+                        Join VdoTube and start sharing your story
                     </p>
                 </div>
 

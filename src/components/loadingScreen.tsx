@@ -301,7 +301,7 @@ export function LoadingScreen({ onComplete }: Readonly<LoadingScreenProps>) {
                   transition={{ delay: 0.5, duration: 0.8 }}
                   className="text-4xl font-bold text-black"
                 >
-                  Vidloom
+                  VdoTube
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0 }}
@@ -327,7 +327,7 @@ export function LoadingScreen({ onComplete }: Readonly<LoadingScreenProps>) {
                   progress < 60 &&
                   "Loading amazing content..."}
                 {progress >= 60 && progress < 90 && "Almost ready..."}
-                {progress >= 90 && "Welcome to Vidloom!"}
+                {progress >= 90 && "Welcome to VdoTube!"}
               </div>
 
               {/* Progress Bar */}

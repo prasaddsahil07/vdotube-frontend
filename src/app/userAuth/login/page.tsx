@@ -35,19 +35,29 @@ export default function LoginPage() {
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: 'include',
             body: JSON.stringify(userData),
         });
 
         if (response.ok) {
             const res_data = await response.json();
-            const data = res_data.data;
-            const userData = data.user;
+            const userData = res_data.user;
+
+            // Get tokens from cookies or response headers
+            const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+                const [key, value] = cookie.trim().split('=');
+                acc[key] = value;
+                return acc;
+            }, {} as Record<string, string>);
+
+            const accessToken = cookies.accessToken || res_data.accessToken;
+            const refreshToken = cookies.refreshToken || res_data.refreshToken;
 
             // Store user data in local storage
             const currentTime = new Date().getTime();
             localStorage.setItem("user", JSON.stringify(userData));
-            localStorage.setItem("accessToken", data.accessToken);
-            localStorage.setItem("refreshToken", data.refreshToken);
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("timestamp", JSON.stringify(currentTime));
 
             dispatch(
@@ -58,8 +68,8 @@ export default function LoginPage() {
                     coverImage: userData.coverImage,
                     fullName: userData.fullName,
                     watchHistory: userData.watchHistory,
-                    accessToken: data.accessToken,
-                    refreshToken: data.refreshToken,
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
                     id: userData._id,
                 })
             );
@@ -99,7 +109,7 @@ export default function LoginPage() {
                     </h3>
                     <p className="text-base text-muted-foreground mt-1 flex items-center gap-2">
                         <ArrowRight className="w-4 h-4 text-blue-400" />
-                        Sign in to your Vidloom account
+                        Sign in to your VdoTube account
                     </p>
                 </div>
 

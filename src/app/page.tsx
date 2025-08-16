@@ -153,7 +153,7 @@ export default function Home() {
             animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
             transition={{ duration: 0.4, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            Welcome to <span className="text-orange-400">Vidloom</span>
+                            Welcome to <span className="text-orange-400">VdoTube</span>
           </motion.h1>
           {/* Animated subtext with blur entry effect using motion */}
           <motion.p
