@@ -110,6 +110,17 @@ export default function VideoUpload() {
         formData.append('video', videoFileInputRef.current!.files![0])
         formData.append('category', category)
 
+
+        // Add these debug logs
+        // console.log("Full userData from Redux:", userData);
+        // console.log("user array:", userData.user);
+        // console.log("user object:", user);
+        // console.log("accessToken:", user?.accessToken);
+
+        // Also check localStorage
+        console.log("localStorage accessToken:", localStorage.getItem("accessToken"));
+        console.log("localStorage user:", localStorage.getItem("user"));
+
         try {
             const response = await fetch(process.env.url + '/videos', {
                 method: "POST",

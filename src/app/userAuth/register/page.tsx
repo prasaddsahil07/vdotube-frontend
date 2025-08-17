@@ -84,9 +84,9 @@ export default function RegsiterPage() {
         formData.append("avatar", avatarFileInputRef.current!.files![0]);
         formData.append("coverImage", coverImageFileInputRef.current!.files![0]);
 
-        const response = await fetch(process.env.url + "/users/register", {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/users/register", {
             method: "POST",
-            credentials: 'include',
+            // credentials: 'include',
             body: formData,
         });
 

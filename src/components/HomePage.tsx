@@ -36,7 +36,7 @@ export default function HomePage() {
                     {videosData && <>
                         {
 
-                            videosData.data.slice().reverse().slice(0, 4).map((video: any = {}) => (
+                            videosData.data?.slice().reverse().slice(0, 4).map((video: any = {}) => (
                                 <Video
                                     key={video._id}
                                     videoId={video._id}
@@ -64,7 +64,7 @@ export default function HomePage() {
                     {videosData && <>
                         {
 
-                            videosData.data.slice().reverse().filter((video: any = {}) => video.category === 'comedy').slice(0, 4).map((video: any = {}) => (
+                            videosData.data?.slice().reverse().filter((video: any = {}) => video.category === 'comedy').slice(0, 4).map((video: any = {}) => (
                                 <Video
                                     key={video._id}
                                     videoId={video._id}
@@ -93,7 +93,7 @@ export default function HomePage() {
                     {videosData && <>
                         {
 
-                            videosData.data.slice().reverse().filter((video: any = {}) => video.category === 'gaming').slice(0, 4).map((video: any = {}) => (
+                            videosData.data?.slice().reverse().filter((video: any = {}) => video.category === 'gaming').slice(0, 4).map((video: any = {}) => (
                                 <Video
                                     key={video._id}
                                     videoId={video._id}
@@ -122,7 +122,7 @@ export default function HomePage() {
                     {videosData && <>
                         {
 
-                            videosData.data.slice().reverse().slice(0, 4).filter((video: any = {}) => video.category === 'music').map((video: any = {}) => (
+                            videosData.data?.slice().reverse().slice(0, 4).filter((video: any = {}) => video.category === 'music').map((video: any = {}) => (
                                 <Video
                                     key={video._id}
                                     videoId={video._id}
@@ -151,7 +151,7 @@ export default function HomePage() {
                     {videosData && <>
                         {
 
-                            videosData.data.slice().reverse().filter((video: any = {}) => video.category === 'tech').slice(0, 4).map((video: any = {}) => (
+                            videosData.data?.slice().reverse().filter((video: any = {}) => video.category === 'tech').slice(0, 4).map((video: any = {}) => (
 
                                 <Video
                                     key={video._id}

@@ -35,12 +35,13 @@ export default function LoginPage() {
             headers: {
                 "Content-Type": "application/json",
             },
-            credentials: 'include',
+            // credentials: 'include',
             body: JSON.stringify(userData),
         });
 
         if (response.ok) {
             const res_data = await response.json();
+            console.log("Login Response Data:", res_data);
             const userData = res_data.user;
 
             // Get tokens from cookies or response headers
@@ -52,6 +53,9 @@ export default function LoginPage() {
 
             const accessToken = cookies.accessToken || res_data.accessToken;
             const refreshToken = cookies.refreshToken || res_data.refreshToken;
+
+            console.log("Access Token:", accessToken);
+            console.log("Refresh Token:", refreshToken);
 
             // Store user data in local storage
             const currentTime = new Date().getTime();
@@ -125,39 +129,41 @@ export default function LoginPage() {
                     className="flex flex-col gap-6 w-full"
                     onSubmit={handleFormSubmittion}
                 >
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 w-full">
                         <div className="relative w-full">
                             <Input
                                 name="email"
                                 placeholder="Email"
                                 type="email"
-                                className="pl-10"
+                                className="w-full min-w-full px-8 py-3 rounded border border-gray-300 pl-24 block"
+                                style={{ width: '100%' }}
                             />
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            
                         </div>
                         <div className="text-center text-sm text-gray-500">or</div>
-                        <div className="relative w-full">
+                        <div className="relative w-full gap-between">
                             <Input
                                 name="username"
                                 placeholder="Username"
                                 type="text"
-                                className="pl-10"
+                                className="w-full min-w-full px-8 py-3 rounded border border-gray-300 pl-24 block"
+                                style={{ width: '100%' }}
                             />
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            
                         </div>
                         <div className="relative w-full">
                             <Input
                                 name="password"
                                 placeholder="Password"
                                 type="password"
-                                required
-                                className="pl-10"
+                                className="w-full min-w-full px-8 py-3 rounded border border-gray-300 pl-24 block"
+                                style={{ width: '100%' }}
                             />
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-4 pt-2">
+                    <div className="flex flex-col gap-4 pt-2 w-full">
                         {isProcessing ? (
                             <button
                                 className="bg-orange-200 border text-orange-600 w-full animate-pulse hover:bg-orange-100 duration-700 px-4 py-3 rounded font-semibold flex items-center justify-center gap-2"
