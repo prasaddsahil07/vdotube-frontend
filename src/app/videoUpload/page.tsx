@@ -1,8 +1,7 @@
 'use client'
 
-
 import { Label } from '@/components/ui/label';
-import { ArrowRightFromLine, BadgeCheck, HardDriveUpload, ImageUp } from 'lucide-react';
+import { ArrowRightFromLine, BadgeCheck, HardDriveUpload, ImageUp, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -42,8 +41,6 @@ export default function VideoUpload() {
         redirect('/')
     }
 
-
-
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
     const [videoPreview, setVideoPreview] = useState<string | null>(null);
     const [errorMsg, setErrorMessage] = useState('')
@@ -54,7 +51,6 @@ export default function VideoUpload() {
     const videoFileInputRef = useRef<HTMLInputElement>(null)
     const titleRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
-
 
     const handleThumbnailFileSelect = () => {
         thumbnailFileInputRef.current!.click();
@@ -77,7 +73,6 @@ export default function VideoUpload() {
         videoFileInputRef.current!.click();
     }
 
-
     const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target!.files![0];
         if (file) {
@@ -90,16 +85,16 @@ export default function VideoUpload() {
         }
     };
 
-
-
     const handelFormSubmittion = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         setIsProcessing(true)
 
         if (!videoPreview || !thumbnailPreview) {
-            setErrorMessage('Eeither video or thumbnail file is missing.');
+            setErrorMessage('Either video or thumbnail file is missing.');
             setIsProcessing(false);
+            return;
         }
+
         const selectElement: any = document.getElementById('category');
         const category = selectElement?.value;
 
@@ -107,19 +102,11 @@ export default function VideoUpload() {
         formData.append('title', titleRef.current!.value);
         formData.append('description', descriptionRef.current!.value);
         formData.append('thumbnail', thumbnailFileInputRef.current!.files![0]);
-        formData.append('video', videoFileInputRef.current!.files![0])
-        formData.append('category', category)
+        formData.append('video', videoFileInputRef.current!.files![0]);
+        formData.append('category', category);
 
-
-        // Add these debug logs
-        // console.log("Full userData from Redux:", userData);
-        // console.log("user array:", userData.user);
-        // console.log("user object:", user);
-        // console.log("accessToken:", user?.accessToken);
-
-        // Also check localStorage
-        console.log("localStorage accessToken:", localStorage.getItem("accessToken"));
-        console.log("localStorage user:", localStorage.getItem("user"));
+        // Get token from localStorage as fallback
+        const token = user?.accessToken || localStorage.getItem("accessToken");
 
         try {
             const response = await fetch(process.env.url + '/videos', {
@@ -127,23 +114,22 @@ export default function VideoUpload() {
                 headers: {
                     'Authorization': `Bearer ${user.accessToken}`
                 },
-
                 body: formData
             })
 
             if (response.ok) {
                 const res_data = await response.json()
                 setIsProcessing(false)
-
                 setVideoData(res_data.data)
-                // resting value
+                
+                // Reset form values
                 if (thumbnailFileInputRef.current) thumbnailFileInputRef.current.value = '';
                 if (videoFileInputRef.current) videoFileInputRef.current.value = '';
                 if (titleRef.current) titleRef.current.value = '';
                 if (descriptionRef.current) descriptionRef.current.value = '';
                 setThumbnailPreview(null)
                 setVideoPreview(null)
-
+                setErrorMessage('')
 
                 toast("Video Uploaded", {
                     description: 'Video has been uploaded successfully',
@@ -152,8 +138,7 @@ export default function VideoUpload() {
                         onClick: () => { },
                     },
                 })
-            }
-            else {
+            } else {
                 const error = await response.json()
                 setErrorMessage(error.msg)
                 setIsProcessing(false)
@@ -168,93 +153,181 @@ export default function VideoUpload() {
             })
             setIsProcessing(false)
         }
-
     }
 
-
-
-
-
     return (
-        <div className='flex flex-col w-screen justify-center items-center'>
-            <h2 className='text-4xl font-semibold md:py-12 sm:py-6 underline '>Upload Your Video</h2>
-            <div className='border p-4 rounded-lg border-input' >
-                {errorMsg && <p className='text-red-400 text-sm relative'>{errorMsg}</p>}
-                <form className='flex flex-col px-4justify-center items-start space-y-6' onSubmit={handelFormSubmittion}>
+        <div className='flex flex-col w-screen justify-center items-center px-4'>
+            <h2 className='text-4xl font-semibold md:py-12 sm:py-6 underline text-center'>Upload Your Video</h2>
+            
+            <div className='border p-6 rounded-lg border-input max-w-4xl w-full'>
+                {errorMsg && (
+                    <div className='bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-lg mb-6'>
+                        {errorMsg}
+                    </div>
+                )}
+                
+                <form className='flex flex-col justify-center items-start space-y-8' onSubmit={handelFormSubmittion}>
+                    {/* File Upload Section */}
+                    <div className='w-full grid md:grid-cols-2 gap-6'>
+                        {/* Video Upload */}
+                        <div 
+                            onClick={handleVideoFileSelect} 
+                            className='border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-blue-400 transition-colors h-48 flex flex-col justify-center items-center'
+                        >
+                            <input 
+                                type='file' 
+                                ref={videoFileInputRef} 
+                                accept="video/*" 
+                                onChange={handleVideoFileChange} 
+                                hidden 
+                                name='video' 
+                                id='video' 
+                            />
+                            
+                            {videoPreview ? (
+                                <div className='text-center'>
+                                    <video 
+                                        src={videoPreview} 
+                                        className='w-32 h-20 object-cover rounded-lg mb-2 mx-auto'
+                                        muted
+                                    />
+                                    <div className='flex items-center justify-center space-x-2 text-green-600'>
+                                        <BadgeCheck size={20} />
+                                        <span className='text-sm font-medium'>Video Selected</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className='text-center'>
+                                    <HardDriveUpload size={48} className="text-gray-400 mb-4" />
+                                    <h4 className='text-gray-600 font-medium mb-2'>Upload your Video</h4>
+                                    <p className='text-sm text-gray-400'>Click to select a video file</p>
+                                </div>
+                            )}
+                        </div>
 
+                        {/* Thumbnail Upload */}
+                        <div 
+                            onClick={handleThumbnailFileSelect} 
+                            className='border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-blue-400 transition-colors h-48 flex flex-col justify-center items-center'
+                        >
+                            <input 
+                                ref={thumbnailFileInputRef} 
+                                accept='image/jpeg, image/png, image/jpg' 
+                                onChange={handleThumbnailFileChange} 
+                                type='file' 
+                                hidden 
+                                name='thumbnail' 
+                                id='thumbnail' 
+                            />
+                            
+                            {thumbnailPreview ? (
+                                <div className='text-center'>
+                                    <Image 
+                                        src={thumbnailPreview} 
+                                        alt="Thumbnail preview"
+                                        width={128}
+                                        height={80}
+                                        className='w-32 h-20 object-cover rounded-lg mb-2 mx-auto'
+                                    />
+                                    <div className='flex items-center justify-center space-x-2 text-green-600'>
+                                        <BadgeCheck size={20} />
+                                        <span className='text-sm font-medium'>Thumbnail Selected</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className='text-center'>
+                                    <ImageUp size={48} className="text-gray-400 mb-4" />
+                                    <h4 className='text-gray-600 font-medium mb-2'>Upload Thumbnail</h4>
+                                    <p className='text-sm text-gray-400'>Click to select an image</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                    <div className='md:flex md:space-x-4 sm:space-y-4 md:space-y-0 md:flex-row sm:flex sm:flex-col'>
+                    {/* Video Details Section */}
+                    <div className='w-full space-y-6'>
+                        <div className='grid md:grid-cols-2 gap-6'>
+                            <div className='flex flex-col space-y-2'>
+                                <Label htmlFor='title' className='text-sm font-medium text-gray-700'>Video Title</Label>
+                                <input 
+                                    required 
+                                    maxLength={100} 
+                                    ref={titleRef} 
+                                    type="text" 
+                                    name="title" 
+                                    id='title' 
+                                    placeholder='Enter an engaging title for your video' 
+                                    className='w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all' 
+                                />
+                            </div>
 
-
-                        {/* video upload */}
-                        <div onClick={handleVideoFileSelect} className='border md:w-60 sm:w-80 h-40 px-8 py-8 border-dotted cursor-pointer '>
-
-                            <input type='file' ref={videoFileInputRef} accept="video/*" onChange={handleVideoFileChange} hidden name='coverImage' id='coverImage' className=' w-80 rounded-md h-10 px-4 py-2 bg-transparent border border-gray-200' />
-                            <div className='flex flex-col space-y-4 text-gray-400  items-center '>
-                                {videoPreview && (
-                                    <BadgeCheck color="#2ac200" />
-                                )}
-                                {
-                                    !videoPreview && <HardDriveUpload size={32} color="#949494" />
-                                }
-
-                                <h4>Upload your Video</h4>
-
+                            <div className='flex flex-col space-y-2'>
+                                <Label htmlFor="category" className='text-sm font-medium text-gray-700'>Select Video Category</Label>
+                                <select 
+                                    id="category" 
+                                    className='w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white'
+                                >
+                                    <option value="general">General</option>
+                                    <option value="gaming">Gaming</option>
+                                    <option value="tech">Tech</option>
+                                    <option value="comedy">Comedy</option>
+                                    <option value="music">Music</option>
+                                </select>
                             </div>
                         </div>
 
-                        {/* thumbnail upload */}
-
-                        <div onClick={handleThumbnailFileSelect} className='border px-8 py-8 border-dotted cursor-pointer'>
-                            <input ref={thumbnailFileInputRef} accept='image/jpeg, image/png, image/jpg' onChange={handleThumbnailFileChange} type='file' hidden name='thumbnail' id='thumbnal' className=' w-80 rounded-md h-10 px-4 py-2 bg-transparent border border-gray-200' />
-                            <div className='flex flex-col space-y-4 text-gray-400 space-x-4 items-center '>
-                                {thumbnailPreview && (
-                                    <BadgeCheck color="#2ac200" />
-                                )} {
-                                    !thumbnailPreview && (
-                                        <ImageUp size={32} color="#949494" />
-                                    )
-                                }
-                                <h4>Upload your Video Thumbnail</h4>
-                            </div>
+                        <div className='flex flex-col space-y-2'>
+                            <Label htmlFor='description' className='text-sm font-medium text-gray-700'>Video Description</Label>
+                            <textarea 
+                                required 
+                                ref={descriptionRef} 
+                                placeholder='Describe your video content...' 
+                                id='description' 
+                                rows={4}
+                                className='w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-vertical' 
+                            />
                         </div>
                     </div>
-                    <div className='sm:flex sm:flex-col md:flex md:flex-row sm:space-y-4 md:space-y-0 justify-center md:items-center md:space-x-4'>
-                        <div className='flex flex-col space-y-2 justify-start items-start'>
-                            <Label htmlFor='title'>Video Title</Label>
-                            <input required maxLength={50} ref={titleRef} type="text" name="title" id='title' placeholder='video title' className=' bg-transparent px-4 py-1 rounded-lg border border-input ' />
-                        </div>
-                        <div className='flex flex-col bg-transparent space-y-2 justify-start items-start'>
 
-                            <Label htmlFor="category">Select Video Category</Label>
-                            <select className='w-28 h-8 border border-accent px-2 rounded-lg space-y-2' id="category" >
-                                <option className='' value="general">General</option>
-                                <option className='' value="gaming">Gaming</option>
-                                <option className='' value="tech">Tech</option>
-                                <option className='' value="comedy">Comedy</option>
-                                <option className='' value="music">Music</option>
-                            </select>
-
-                        </div>
-
+                    {/* Submit Button */}
+                    <div className='w-full flex justify-center'>
+                        <button 
+                            type="submit"
+                            disabled={isProcessing}
+                            className='px-8 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-semibold rounded-xl transition-all duration-300 flex items-center space-x-2 min-w-[200px] justify-center'
+                        >
+                            {isProcessing ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                    <span>Uploading...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <HardDriveUpload className="w-5 h-5" />
+                                    <span>Upload Video</span>
+                                </>
+                            )}
+                        </button>
                     </div>
-
-                    <div className='flex flex-col space-y-2 w-full'>
-                        <Label htmlFor='description'>Video Description</Label>
-                        <textarea required ref={descriptionRef} placeholder='video description' id='description' className='"flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",' />
-                    </div>
-                    {
-                        isProcessing && <button className='px-8 rounded-xl animate-pulse hover:bg-blue-500 duration-7s00 py-2 bg-blue-400 text-lg font-semibold'>Uploading your video</button>
-                    }
-                    {
-                        !isProcessing && <button className='px-8 rounded-xl hover:bg-blue-500 duration-300 py-2 bg-blue-400 text-lg font-semibold'>Upload</button>
-                    }
                 </form>
             </div>
-            {videoData?._id && <>
-                <Link className='text-lg flex items-center space-x-2 bg-primary text-accent px-4 py-2 mb-4 mt-8 rounded-lg font-semibold' href={`/watchVideo/${videoData._id}`}>
-                    <p>Watch Your Video here</p> <ArrowRightFromLine />
-                </Link></>}
+
+            {/* Success Message with Watch Video Button */}
+            {videoData?._id && (
+                <div className='mt-8 p-6 bg-green-50 border border-green-200 rounded-lg text-center'>
+                    <h3 className='text-lg font-semibold text-green-800 mb-2'>Upload Successful! 🎉</h3>
+                    <p className='text-green-600 mb-4'>Your video has been uploaded and is ready to watch</p>
+                    
+                    <Link 
+                        href={`/watchVideo/${videoData._id}`}
+                        className='inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-95 active:scale-90'
+                    >
+                        <Play className="w-5 h-5" />
+                        <span>Watch Your Video</span>
+                        <ArrowRightFromLine className="w-5 h-5" />
+                    </Link>
+                </div>
+            )}
         </div>
     )
 }

@@ -35,14 +35,18 @@ export default function LoginPage() {
             headers: {
                 "Content-Type": "application/json",
             },
-            // credentials: 'include',
+            credentials: 'include',
             body: JSON.stringify(userData),
         });
 
+        // console.log("Response: ", response);
+
         if (response.ok) {
             const res_data = await response.json();
-            console.log("Login Response Data:", res_data);
+            // console.log("Login Response Data:", res_data);
             const userData = res_data.user;
+
+            // console.log("Looking for cookie in document: ", document.cookie);
 
             // Get tokens from cookies or response headers
             const cookies = document.cookie.split(';').reduce((acc, cookie) => {
@@ -51,11 +55,13 @@ export default function LoginPage() {
                 return acc;
             }, {} as Record<string, string>);
 
+            // console.log("Looking for cookies: ", cookies);
+
             const accessToken = cookies.accessToken || res_data.accessToken;
             const refreshToken = cookies.refreshToken || res_data.refreshToken;
 
-            console.log("Access Token:", accessToken);
-            console.log("Refresh Token:", refreshToken);
+            // console.log("Access Token:", accessToken);
+            // console.log("Refresh Token:", refreshToken);
 
             // Store user data in local storage
             const currentTime = new Date().getTime();
@@ -72,8 +78,8 @@ export default function LoginPage() {
                     coverImage: userData.coverImage,
                     fullName: userData.fullName,
                     watchHistory: userData.watchHistory,
-                    accessToken: accessToken,
-                    refreshToken: refreshToken,
+                    // accessToken: accessToken,
+                    // refreshToken: refreshToken,
                     id: userData._id,
                 })
             );

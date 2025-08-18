@@ -86,7 +86,7 @@ export default function RegsiterPage() {
 
         const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/users/register", {
             method: "POST",
-            // credentials: 'include',
+            credentials: 'include',
             body: formData,
         });
 

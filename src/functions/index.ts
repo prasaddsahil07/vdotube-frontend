@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 export async function healthCheck() {
     const response = await fetch(process.env.url + '/healthcheck', {
-        // credentials: 'include'
+        credentials: 'include'
     })
     if (response.ok) {
         const res_data = await response.json()
@@ -40,7 +40,7 @@ export async function getUserVideos({ userId, accessToken }: { userId: string, a
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             },
-            // credentials: 'include'
+            credentials: 'include'
         })
 
     if (response.ok) {
@@ -61,7 +61,7 @@ export async function LikeVideo({ videoId, accessToken }: { videoId: string, acc
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             },
-            // credentials: 'include'
+            credentials: 'include'
         })
 
     if (response.ok) {
@@ -82,7 +82,7 @@ export async function LikeTweet({ tweetId, accessToken }: { tweetId: string, acc
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             },
-            // credentials: 'include'
+            credentials: 'include'
         })
 
     if (response.ok) {
@@ -103,7 +103,7 @@ export async function fetchVideoByid({ videoId, accessToken }: { accessToken: st
         headers: {
             'Authorization': `Bearer ${accessToken}`
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -128,7 +128,7 @@ export async function getChannelStats({ channelId, accessToken }: { channelId: s
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             },
-            // credentials: 'include'
+            credentials: 'include'
 
         })
 
@@ -273,13 +273,16 @@ export async function updateUserCoverImage({ accessToken, file }: { accessToken:
 }
 
 
-export async function getAllPublishedVideos({ accessToken }: { accessToken: string }) {
-    const response = await fetch(process.env.url + '/dashboard/videos/getAllPublishedVideos/published', {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        },
-        // credentials: 'include'
-    })
+export async function getAllPublishedVideos({ accessToken, page, limit }: { accessToken: string, page: number, limit: number }) {
+    const response = await fetch(
+        `${process.env.url}/dashboard/videos/getAllPublishedVideos/published?page=${page}&limit=${limit}`,
+        {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            },
+            credentials: 'include'
+        }
+    )
 
     if (response.ok) {
         const data = await response.json()
@@ -296,7 +299,7 @@ export async function getUserByID({ userId, accessToken }: { userId: any, access
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -317,7 +320,7 @@ export async function addVideoToWatchHistory({ videoId, accessToken }: { videoId
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -337,7 +340,7 @@ export async function getUserWatchHistory({ accessToken }: { accessToken: string
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -358,7 +361,7 @@ export async function getUserLikedVideo({ accessToken }: { accessToken: string }
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -378,7 +381,7 @@ export async function getUserLikedTweets({ accessToken }: { accessToken: string 
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -400,7 +403,7 @@ export async function getAllTweets({ accessToken }: { accessToken: string }) {
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -419,7 +422,7 @@ export async function checkLiked({ accessToken, id }: { accessToken: string, id:
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -438,7 +441,7 @@ export async function checkTweetLiked({ accessToken, id }: { accessToken: string
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -457,7 +460,7 @@ export async function checkIfSubscribed({ accessToken, channelId }: { accessToke
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -477,7 +480,7 @@ export async function deleteVideo({ accessToken, id }: { accessToken: string, id
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -499,7 +502,7 @@ export async function ToggleSubscription({ channelId, accessToken }: { channelId
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             },
-            // credentials: 'include'
+            credentials: 'include'
         })
 
     if (response.ok) {
@@ -520,7 +523,7 @@ export async function TogglePublish({ videoId, accessToken }: { videoId: string,
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             },
-            // credentials: 'include'
+            credentials: 'include'
         })
 
     if (response.ok) {
@@ -589,7 +592,7 @@ export async function DeleteTweet({ accessToken, tweetId }: { accessToken: strin
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
 
     })
@@ -610,7 +613,7 @@ export async function getUserTweets({ accessToken, userId }: { accessToken: stri
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
 
     })
@@ -697,7 +700,7 @@ export async function GetVideoComment({ accessToken, videoId }: { accessToken: s
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -748,7 +751,7 @@ export async function DeleteComment({ accessToken, commentId }
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
 
     })
@@ -772,7 +775,7 @@ export async function LikeComment({ commentId, accessToken }: { commentId: strin
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             },
-            // credentials: 'include'
+            credentials: 'include'
         })
 
     if (response.ok) {
@@ -790,7 +793,7 @@ export async function checkCommentLiked({ accessToken, id }: { accessToken: stri
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
-        // credentials: 'include'
+        credentials: 'include'
 
     })
 
@@ -841,7 +844,7 @@ export async function GetUserPlaylists({ accessToken, userId }: { accessToken: s
         headers: {
             'Authorization': `Bearer ${accessToken}`
         },
-        // credentials: 'include'
+        credentials: 'include'
     })
     if (response.ok) {
         const res_data = await response.json()
@@ -858,7 +861,7 @@ export async function GetPlaylistById({ accessToken, playlistId }: { accessToken
         headers: {
             'Authorization': `Bearer ${accessToken}`
         },
-        // credentials: 'include'
+        credentials: 'include'
     })
     if (response.ok) {
         const res_data = await response.json()
@@ -876,7 +879,7 @@ export async function AddVideoToPlaylist({ accessToken, playlistId, videoId }: {
         headers: {
             'Authorization': `Bearer ${accessToken}`
         },
-        // credentials: 'include'
+        credentials: 'include'
     })
     if (response.ok) {
         const res_data = await response.json()
@@ -894,7 +897,7 @@ export async function DeletedPlaylist({ accessToken, playlistId }: { accessToken
         headers: {
             'Authorization': `Bearer ${accessToken}`
         },
-        // credentials: 'include'
+        credentials: 'include'
     })
     if (response.ok) {
         const res_data = await response.json()
@@ -912,7 +915,7 @@ export async function RemoveVideoFromPlaylist({ accessToken, playlistId, videoId
         headers: {
             'Authorization': `Bearer ${accessToken}`
         },
-        // credentials: 'include'
+        credentials: 'include'
     })
     if (response.ok) {
         const res_data = await response.json()

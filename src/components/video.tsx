@@ -61,7 +61,6 @@ const Video: React.FC<VideoProps> = ({
     }, [user, owner]);
 
     //checking if logged in user is owner of video
-
     useEffect(() => {
         if (user.id === ownerDetails?._id) {
             setVideoOwner(true);
@@ -69,7 +68,6 @@ const Video: React.FC<VideoProps> = ({
     }, [user, ownerDetails]);
 
     //coverting created at to real time
-
     const formattedTimeDifference = formatTimeDifference(createdAt);
     const videoDuration = formatSecondsToMinutes(duration);
 
