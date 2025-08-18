@@ -273,9 +273,9 @@ export async function updateUserCoverImage({ accessToken, file }: { accessToken:
 }
 
 
-export async function getAllPublishedVideos({ accessToken, page, limit }: { accessToken: string, page: number, limit: number }) {
+export async function getAllPublishedVideos({ accessToken }: { accessToken: string }) {
     const response = await fetch(
-        `${process.env.url}/dashboard/videos/getAllPublishedVideos/published?page=${page}&limit=${limit}`,
+        `${process.env.url}/dashboard/videos/getAllPublishedVideos/published`,
         {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -303,7 +303,8 @@ export async function getUserByID({ userId, accessToken }: { userId: any, access
 
     })
 
-
+    // console.log("Printing ok: ", response.ok);
+    // console.log("Printing code: ", response.status);
     if (response.ok) {
         const data = await response.json()
         return { status: true, data: data }

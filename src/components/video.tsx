@@ -50,9 +50,9 @@ const Video: React.FC<VideoProps> = ({
                 accessToken: user.accessToken,
             });
             if (response.status === true) {
-                setOwnerDetails(response.data);
+                setOwnerDetails(response.data.data);
             } else {
-                console.log(response.data);
+                console.log(response.data.data);
             }
         };
         if (user) {
@@ -83,7 +83,7 @@ const Video: React.FC<VideoProps> = ({
     }
 
     return (
-        <div className="flex flex-col items-start space-y-2 font-bold text-gray-300">
+        <div className="flex flex-col items-start space-y-2 font-bold text-gray-600">
             <div className="flex relative">
                 <Link
                     onClick={handleClick}
@@ -123,7 +123,7 @@ const Video: React.FC<VideoProps> = ({
                     <div className=" md:w-60 sm:w-60  flex items-center justify-between">
                         <Link href={`/viewChannel/${ownerDetails?._id}`}>
                             <div className="flex items-center space-x-1">
-                                <h4 className="text-[12px] text-gray-300">
+                                <h4 className="text-[12px] text-gray-600">
                                     {" "}
                                     {ownerDetails?.fullName}
                                 </h4>
@@ -132,7 +132,7 @@ const Video: React.FC<VideoProps> = ({
                                 </p>
                             </div>
                         </Link>
-                        <div className="text-[11px] flex items-center space-x-2   text-gray-400">
+                        <div className="text-[11px] flex items-center space-x-8 text-gray-600">
                             <p>{views} views</p>
                             <p>{formattedTimeDifference}</p>
                         </div>

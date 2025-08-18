@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { EllipsisVertical, Plus } from "lucide-react";
+import { EllipsisVertical, Plus, PlaySquare } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -43,6 +43,7 @@ export default function AddVideoToPlaylistComp({
   const [userPlaylistData, setUserPlaylistData] = useState<any>([]);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isPosting, setIsPosting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   //creating new playlists
 
@@ -112,11 +113,10 @@ export default function AddVideoToPlaylistComp({
     });
     if (response.status === true) {
       setIsPosting(false);
-
+      setIsDialogOpen(false);
       dispatch(userActions.isChanged({}));
-      buttonRef.current?.click();
       toast("Playlist Created", {
-        description: "Plalist has been created successfully",
+        description: "Playlist has been created successfully",
         action: {
           label: "Okay",
           onClick: () => {},
@@ -137,102 +137,149 @@ export default function AddVideoToPlaylistComp({
   return (
     <div className="h-5">
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <EllipsisVertical />
+        <DropdownMenuTrigger className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <EllipsisVertical className="w-5 h-5 text-gray-700 dark:text-gray-300" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="bg-black">
+        <DropdownMenuContent className="w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg">
           {isWatchingPage && (
             <>
-              <DropdownMenuLabel>Add To Playlist</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {userPlaylistData &&
+              <DropdownMenuLabel className="text-gray-900 dark:text-gray-100 font-semibold px-2 py-2">
+                Add To Playlist
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+              {userPlaylistData && userPlaylistData.length > 0 ? (
                 userPlaylistData.map((playlist: any) => (
-                  <DropdownMenuItem key={playlist._id}>
-                    <button onClick={() => handleButtonClick(playlist._id)}>
-                      {playlist.name}
+                  <DropdownMenuItem 
+                    key={playlist._id}
+                    className="focus:bg-gray-100 dark:focus:bg-gray-800 cursor-pointer"
+                  >
+                    <button 
+                      onClick={() => handleButtonClick(playlist._id)}
+                      className="w-full text-left flex items-center space-x-2 text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100"
+                    >
+                      <PlaySquare className="w-4 h-4" />
+                      <span className="truncate">{playlist.name}</span>
                     </button>
                   </DropdownMenuItem>
-                ))}
-              <DropdownMenuSeparator />
+                ))
+              ) : (
+                <DropdownMenuItem disabled>
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">
+                    No playlists found
+                  </span>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
             </>
           )}
 
-          <Dialog>
-            <DialogTrigger className="bg-black">
-              <div className="flex items-center bg-black rounded-xl hover:opacity-80 duration-700 ease-out bg-accent px-2 py-2 font-semibold space-x-1">
-                <h4 className="text-sm ml-1">New Playlist </h4>
-                <Plus size={20} />
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <div 
+                className="w-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDialogOpen(true);
+                }}
+              >
+                <DropdownMenuItem 
+                  className="focus:bg-gray-100 dark:focus:bg-gray-800 cursor-pointer"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  <div className="flex items-center space-x-2 text-gray-800 dark:text-gray-200">
+                    <Plus className="w-4 h-4" />
+                    <span>Create New Playlist</span>
+                  </div>
+                </DropdownMenuItem>
               </div>
             </DialogTrigger>
-            <DialogContent className="sm:w-80 md:w-auto">
+            <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
               <DialogHeader>
-                <DialogTitle className="text-gray-400 text-center">
+                <DialogTitle className="text-gray-900 dark:text-gray-100 text-center text-xl font-semibold">
                   Create New Playlist
                 </DialogTitle>
+              </DialogHeader>
 
-                <form
-                  className="flex md:pt-8 sm:pt-2  flex-col md:justify-start md:items-start space-y-4"
-                  onSubmit={handleFormSubmittion}
-                >
-                  <div className="sm:flex sm:flex-col md:flex md:flex-row justify-between md:items-start md:space-x-4 sm:space-y-4 md:space-y-0">
-                    <div className="flex flex-col space-y-2">
-                      <Label htmlFor="name">Name</Label>
-                      <Input id="name" name="name" className="h-8 w-60" />
-                    </div>
-
-                    <div className="flex flex-col justify-start space-y-2">
-                      <Label htmlFor="category">Select Playlist Category</Label>
-                      <select
-                        className="w-28 h-8 border border-accent px-2 rounded-lg space-y-2"
-                        id="category"
-                      >
-                        <option className="" value="general">
-                          General
-                        </option>
-                        <option className="" value="gaming">
-                          Gaming
-                        </option>
-                        <option className="" value="tech">
-                          Tech
-                        </option>
-                        <option className="" value="comedy">
-                          Comedy
-                        </option>
-                        <option className="" value="music">
-                          Music
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      className="w-60"
+              <form
+                className="flex pt-6 flex-col space-y-6"
+                onSubmit={handleFormSubmittion}
+              >
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-gray-700 dark:text-gray-300 font-medium">
+                      Playlist Name
+                    </Label>
+                    <Input 
+                      id="name" 
+                      name="name" 
+                      placeholder="Enter playlist name"
+                      className="bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-400" 
+                      required
                     />
                   </div>
 
-                  {isPosting ? (
-                    <button
-                      disabled
-                      className="px-8 bg-gray-400 rounded-xl animate-pulse  duration-500 text-accent font-bold  py-2 "
+                  <div className="space-y-2">
+                    <Label htmlFor="category" className="text-gray-700 dark:text-gray-300 font-medium">
+                      Category
+                    </Label>
+                    <select
+                      className="w-full h-10 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                      id="category"
+                      defaultValue="general"
                     >
-                      creating playlist..
-                    </button>
-                  ) : (
-                    <button className="px-8 hover:bg-gray-400 rounded-xl duration-500 text-accent font-bold  py-2 bg-white">
-                      Create Playlist
-                    </button>
-                  )}
-                </form>
-              </DialogHeader>
-              <DialogClose asChild>
-                <button ref={buttonRef} className="hidden">
-                  close
-                </button>
-              </DialogClose>
+                      <option value="general">General</option>
+                      <option value="gaming">Gaming</option>
+                      <option value="tech">Tech</option>
+                      <option value="comedy">Comedy</option>
+                      <option value="music">Music</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description" className="text-gray-700 dark:text-gray-300 font-medium">
+                      Description
+                    </Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      placeholder="Add a description for your playlist (optional)"
+                      className="bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-400 min-h-[80px]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsDialogOpen(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  
+                  <button
+                    type="submit"
+                    disabled={isPosting}
+                    className={`flex-1 px-4 py-2 rounded-md font-medium transition-all duration-200 ${
+                      isPosting
+                        ? "bg-gray-400 dark:bg-gray-600 text-gray-200 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
+                    }`}
+                  >
+                    {isPosting ? (
+                      <span className="flex items-center justify-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Creating...</span>
+                      </span>
+                    ) : (
+                      "Create Playlist"
+                    )}
+                  </button>
+                </div>
+              </form>
             </DialogContent>
           </Dialog>
         </DropdownMenuContent>

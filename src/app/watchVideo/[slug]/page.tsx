@@ -14,7 +14,7 @@ import {
   getChannelStats,
   getUserByID,
 } from "@/functions";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { ThumbsDown, ThumbsUp, ChevronDown, ChevronUp } from "lucide-react";
 import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,8 +35,8 @@ interface VideoData {
   _id: string;
   title: string;
   description: string;
-  createdAt: string; // This should be a date string, you might want to use Date type instead
-  updatedAt: string; // This should be a date string, you might want to use Date type instead
+  createdAt: string;
+  updatedAt: string;
   duration: number;
   isPublished: boolean;
   owner: string;
@@ -74,6 +74,7 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
   const [subscribe, setSubscribe] = useState(false);
   const [channelStats, setChannelStats] = useState<MyData>();
   const [ownerDetails, setOwnerDetails] = useState<any>();
+  const [showRecommended, setShowRecommended] = useState(false);
   const data = useSelector((state: any) => state.user);
   const user = data.user[0];
   const dispatch = useDispatch();
@@ -116,9 +117,7 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
         accessToken: user.accessToken,
       });
       if (response.status === true) {
-        setOwnerDetails(response.data);
-      } else {
-        console.log(response.data);
+        setOwnerDetails(response.data.data);
       }
     };
     if (ownerId) {
@@ -199,7 +198,7 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
         description: "Comment added successfully",
         action: {
           label: "Okay",
-          onClick: () => {},
+          onClick: () => { },
         },
       });
     } else {
@@ -207,7 +206,7 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
         description: "failed to add your tweet",
         action: {
           label: "Okay",
-          onClick: () => {},
+          onClick: () => { },
         },
       });
     }
@@ -281,260 +280,289 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
     }
   }, [user]);
 
+  // Filter function to get recommended videos (excluding current video)
+  const getRecommendedVideos = () => {
+    if (!videosData || !videoData) return [];
+
+    const allVideos = videosData.data
+      .slice()
+      .reverse()
+      .filter((video: any) => video._id !== videoId); // Exclude current video
+
+    // First, get videos from same category
+    const sameCategoryVideos = allVideos
+      .filter((video: any) => video.category === videoData.category)
+      .slice(0, 7);
+
+    // Then, fill remaining slots with other categories
+    const remainingSlots = Math.max(0, 15 - sameCategoryVideos.length);
+    const otherVideos = allVideos
+      .filter((video: any) =>
+        video.category !== videoData.category &&
+        !sameCategoryVideos.some((cv: any) => cv._id === video._id)
+      )
+      .slice(0, remainingSlots);
+
+    return [...sameCategoryVideos, ...otherVideos];
+  };
+
   return (
-    <div className="flex md:mx-12 justify-evenly items-start ">
-      {/* main video */}
+    <div className="min-h-screen">
+      <div className="flex flex-col lg:flex-row lg:mx-8 xl:mx-12 gap-6 p-4">
+        {/* Main video section */}
+        {videoData && (
+          <div className="flex-1 lg:max-w-4xl">
+            <div className="space-y-6">
+              <video
+                className="rounded-2xl shadow-lg w-full max-h-[70vh]"
+                controls
+                poster={videoData.thumbnail}
+              >
+                <source src={link} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
 
-      {videoData && (
-        <div className="sm:mt-8 sm:mx-3 flex flex-col md:w-1/2 md:h-[800px] space-y-3">
-          <video
-            className="rounded-2xl shadow-inner sm:w-[380px] md:w-full shadow-gray-300 mb-4"
-            width="700"
-            height="500"
-            controls
-          >
-            <source src={link} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-          <h3 className="md:text-xl  sm:text-sm font-bold">
-            {videoData.title}
-          </h3>
-          <div className="flex items-center  font-bold text-gray-300 text-[12px] space-x-2">
-            <p className="">{videoData.view} views</p>
-            <p>{createdAt}</p>
-          </div>
-          <div className="flex justify-between">
-            <div className="flex space-x-2">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={ownerDetails?.avatar} />
-                <AvatarFallback>AC</AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold md:text-lg">
-                  {ownerDetails?.fullName}
-                </h3>
-                <p className="text-[12px] text-gray-400">
-                  {channelSubscribers} Subscriber
-                </p>
-              </div>
-            </div>
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold leading-tight">
+                {videoData.title}
+              </h1>
 
-            <div className="flex  justify-center items-center space-x-2">
-              {subscribe ? (
-                <button
-                  onClick={handleSubscribeButton}
-                  className="bg-green-500 sm:text-[12px] md:text-base md:px-3 sm:px-1 font-bold md:py-2 sm:py-1 rounded-3xl"
-                >
-                  Subscribed
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubscribeButton}
-                  className="bg-white font-bold text-black sm:text-[12px] md:text-base md:px-3 sm:px-1 md:py-2 sm:py-1 rounded-3xl"
-                >
-                  Subscribe
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* like section */}
-          <div className="flex justify-between items-center space-x-2 font-bold  sm:px-2 sm:py-1 rounded-3xl ">
-            <div className="flex space-x-4 rounded-3xl items-center bg-[#0f0f0f] px-4 py-1">
-              <button onClick={handleLikeButton}>
-                {liked && <ThumbsUp size={18} color="#FF004D" />}
-                {!liked && <ThumbsUp size={18} color="#6c6a6a" />}
-              </button>
-              <p className="text-[#2c2a2a]">|</p>
-              {liked ? (
-                <button onClick={handleLikeButton} className="flex items-end">
-                  <ThumbsDown size={18} color="#6c6a6a" />
-                </button>
-              ) : (
-                <button
-                  disabled
-                  onClick={handleLikeButton}
-                  className="flex items-end"
-                >
-                  <ThumbsDown size={18} color="#6c6a6a" />
-                </button>
-              )}
-            </div>
-            {<AddVideoToPlaylistComp videoId={videoId} isWatchingPage={true} />}
-          </div>
-
-          {/* description section */}
-
-          <Accordion
-            className="bg-[#0f0f0f] mt-4 px-4 pb-4 rounded-2xl"
-            type="single"
-            collapsible
-          >
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="text-gray-300 text-lg">
-                Description
-              </AccordionTrigger>
-              <AccordionContent className="md:w-[600px] sm:w-[280px]">
-                {videoData.description}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
-          {/* comment section */}
-
-          <div className="pt-6">
-            <h2 className="text-xl font-bold pb-8 ">Comments</h2>
-            <form
-              className="flex flex-col space-y-4 w-full"
-              onSubmit={handleAddCommentForm}
-            >
-              <div className="flex items-end space-x-2 ">
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={user?.avatar} />
-                  <AvatarFallback>AC</AvatarFallback>
-                </Avatar>
-
-                <textarea
-                  ref={commentRef}
-                  rows={1}
-                  placeholder="Add a comment..."
-                  className=" px-2 py-1 w-full text-gray-300 text-sm focus:outline-none bg-transparent border-b-2"
-                />
+              {/* Views and time with better visibility */}
+              <div className="flex items-center text-gray-600 text-sm md:text-base space-x-3">
+                <p className="font-medium">{videoData.view.toLocaleString()} views</p>
+                <span className="text-gray-400">•</span>
+                <p className="font-medium">{createdAt}</p>
               </div>
 
-              <div className="flex space-x-2 w-full justify-end">
-                <button
-                  className="sm:text-sm md:text-base"
-                  type="button"
-                  onClick={handleCommentCancelButton}
-                >
-                  cancel
-                </button>
-                <button className="bg-blue-500 px-3 py-1 rounded-2xl hover:opacity-85 sm:text-sm md:text-base">
-                  {" "}
-                  Comment
-                </button>
-              </div>
-            </form>
-            <div className="h-96 mt-4">
-              {videoComments &&
-                videoComments
-                  .slice()
-                  .reverse()
-                  .map((comment: any) => (
-                    <CommentComponent
-                      key={comment._id}
-                      commentId={comment._id}
-                      comment={comment.content}
-                      createdAt={comment.createdAt}
-                      ownerId={comment.owner}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="w-12 h-12 md:w-14 md:h-14">
+                    <AvatarImage
+                      src={ownerDetails?.avatar}
+                      alt={ownerDetails?.fullName || "User Avatar"}
                     />
-                  ))}
+                    <AvatarFallback className="bg-gray-200 text-gray-800">
+                      {ownerDetails?.fullName?.charAt(0)?.toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-semibold text-lg md:text-xl">
+                      {ownerDetails?.fullName}
+                    </h3>
+                    <p className="text-sm md:text-base text-gray-600">
+                      {channelSubscribers?.toLocaleString()} subscribers
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  {subscribe ? (
+                    <button
+                      onClick={handleSubscribeButton}
+                      className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2.5 rounded-full font-medium transition-colors"
+                    >
+                      Subscribed
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSubscribeButton}
+                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-medium transition-colors"
+                    >
+                      Subscribe
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Like section with better visibility */}
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors overflow-hidden">
+                    <button
+                      onClick={handleLikeButton}
+                      className="flex items-center space-x-2 px-4 py-2.5 hover:bg-gray-300 transition-colors"
+                    >
+                      <ThumbsUp
+                        size={20}
+                        color={liked ? "#ff4444" : "#374151"}
+                        fill={liked ? "#ff4444" : "none"}
+                      />
+                      <span className="text-gray-800 font-medium">Like</span>
+                    </button>
+
+                    <div className="w-px h-6 bg-gray-300"></div>
+
+                    <button
+                      onClick={handleLikeButton}
+                      className="flex items-center px-4 py-2.5 hover:bg-gray-300 transition-colors"
+                    >
+                      <ThumbsDown size={20} color="#374151" />
+                    </button>
+                  </div>
+                </div>
+
+                <AddVideoToPlaylistComp videoId={videoId} isWatchingPage={true} />
+              </div>
+
+              {/* Description section - Fixed for all screen sizes */}
+              <div className="mt-6">
+                <Accordion
+                  className="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden"
+                  type="single"
+                  collapsible
+                >
+                  <AccordionItem value="item-1" className="border-none">
+                    <AccordionTrigger className="text-gray-700 hover:text-gray-900 text-lg px-6 py-4 hover:no-underline font-semibold">
+                      Description
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-6 text-gray-700 text-base leading-relaxed">
+                      <div className="whitespace-pre-wrap">
+                        {videoData.description}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+
+              {/* Comment section with proper count visibility */}
+              <div className="mt-8">
+                <h2 className="text-xl md:text-2xl font-bold pb-6 text-gray-900">
+                  {videoComments?.length || 0} Comments
+                </h2>
+
+                <form
+                  className="flex flex-col space-y-4 w-full"
+                  onSubmit={handleAddCommentForm}
+                >
+                  <div className="flex items-start space-x-3">
+                    <Avatar className="w-12 h-12 md:w-14 md:h-14">
+                      <AvatarImage
+                        src={user?.avatar}
+                        alt={user?.fullName || "User Avatar"}
+                      />
+                      <AvatarFallback className="bg-gray-200 text-gray-800">
+                        {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <textarea
+                      ref={commentRef}
+                      rows={1}
+                      placeholder="Add a comment..."
+                      className="px-0 py-2 w-full text-gray-900 placeholder-gray-500 text-base focus:outline-none bg-transparent border-b-2 border-gray-300 focus:border-blue-500 transition-colors resize-none"
+                      onInput={(e) => {
+                        const target = e.target as HTMLTextAreaElement;
+                        target.style.height = 'auto';
+                        target.style.height = target.scrollHeight + 'px';
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex space-x-3 justify-end">
+                    <button
+                      className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors"
+                      type="button"
+                      onClick={handleCommentCancelButton}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition-colors font-medium"
+                    >
+                      Comment
+                    </button>
+                  </div>
+                </form>
+
+                <div className="mt-6 space-y-4">
+                  {videoComments &&
+                    videoComments
+                      .slice()
+                      .reverse()
+                      .map((comment: any) => (
+                        <CommentComponent
+                          key={comment._id}
+                          commentId={comment._id}
+                          comment={comment.content}
+                          createdAt={comment.createdAt}
+                          ownerId={comment.owner}
+                        />
+                      ))}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {videoData && (
-        <div className="sm:hidden lg:block sm:mt-8 border rounded-xl sm:mx-4 p-4 flex flex-col space-y-2 ">
-          <h2 className="font-bold text-xl">You might also like</h2>
+        {/* Recommended videos section - Fixed for mobile */}
+        {videoData && videosData && (
+          <>
+            {/* Mobile recommended videos - collapsible */}
+            <div className="lg:hidden w-full">
+              <button
+                onClick={() => setShowRecommended(!showRecommended)}
+                className="flex items-center justify-between w-full p-4 bg-gray-100 border border-gray-200 rounded-xl text-gray-900 font-bold text-lg hover:bg-gray-200 transition-colors"
+              >
+                <span>You might also like ({getRecommendedVideos().length})</span>
+                {showRecommended ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+              </button>
 
-          {videosData && (
-            <ScrollArea className="h-screen w-[340px] flex flex-col space-y-3 rounded-md ">
-              {videosData.data
-                .slice()
-                .reverse()
-                .filter(
-                  (video: any = {}) => video.category === videoData.category
-                )
-                .slice(0, 7)
-                .map((video: any = {}) => (
-                  <div className="py-2" key={video._id}>
-                    <Video
-                      videoId={video._id}
-                      title={video.title}
-                      videoUrl={video.videoFile}
-                      thumbnailUrl={video.thumbnail}
-                      owner={video.owner}
-                      views={video.view}
-                      createdAt={video.createdAt}
-                      duration={video.duration}
-                      description={video.description}
-                      edit={false}
-                      isPublished={video.isPublished}
-                    />{" "}
+              {showRecommended && (
+                <div className="mt-4 space-y-3 max-h-96 overflow-y-auto">
+                  {getRecommendedVideos().map((video: any) => (
+                    <div key={video._id} className="bg-gray-50 border border-gray-200 rounded-xl p-2">
+                      <Video
+                        videoId={video._id}
+                        title={video.title}
+                        videoUrl={video.videoFile}
+                        thumbnailUrl={video.thumbnail}
+                        owner={video.owner}
+                        views={video.view}
+                        createdAt={video.createdAt}
+                        duration={video.duration}
+                        description={video.description}
+                        edit={false}
+                        isPublished={video.isPublished}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop recommended videos */}
+            <div className="hidden lg:block lg:w-96 xl:w-[420px]">
+              <div className="sticky top-4 border border-gray-200 bg-gray-50 rounded-xl p-4">
+                <h2 className="font-bold text-xl text-gray-900 mb-4">
+                  You might also like
+                </h2>
+
+                <ScrollArea className="h-[calc(100vh-8rem)] pr-4">
+                  <div className="space-y-3">
+                    {getRecommendedVideos().map((video: any) => (
+                      <div key={video._id} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <Video
+                          videoId={video._id}
+                          title={video.title}
+                          videoUrl={video.videoFile}
+                          thumbnailUrl={video.thumbnail}
+                          owner={video.owner}
+                          views={video.view}
+                          createdAt={video.createdAt}
+                          duration={video.duration}
+                          description={video.description}
+                          edit={false}
+                          isPublished={video.isPublished}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              {videosData.data
-                .slice()
-                .reverse()
-                .filter((video: any = {}) => video.category === "general")
-                .slice(0, 4)
-                .map((video: any = {}) => (
-                  <div className="py-2" key={video._id}>
-                    <Video
-                      videoId={video._id}
-                      title={video.title}
-                      videoUrl={video.videoFile}
-                      thumbnailUrl={video.thumbnail}
-                      owner={video.owner}
-                      views={video.view}
-                      createdAt={video.createdAt}
-                      duration={video.duration}
-                      description={video.description}
-                      edit={false}
-                      isPublished={video.isPublished}
-                    />{" "}
-                  </div>
-                ))}
-              {videosData.data
-                .slice()
-                .reverse()
-                .filter((video: any = {}) => video.category === "gaming")
-                .slice(0, 2)
-                .map((video: any = {}) => (
-                  <div className="py-2" key={video._id}>
-                    <Video
-                      videoId={video._id}
-                      title={video.title}
-                      videoUrl={video.videoFile}
-                      thumbnailUrl={video.thumbnail}
-                      owner={video.owner}
-                      views={video.view}
-                      createdAt={video.createdAt}
-                      duration={video.duration}
-                      description={video.description}
-                      edit={false}
-                      isPublished={video.isPublished}
-                    />{" "}
-                  </div>
-                ))}
-              {videosData.data
-                .slice()
-                .reverse()
-                .filter((video: any = {}) => video.category === "comedy")
-                .slice(0, 2)
-                .map((video: any = {}) => (
-                  <div className="py-2" key={video._id}>
-                    <Video
-                      videoId={video._id}
-                      title={video.title}
-                      videoUrl={video.videoFile}
-                      thumbnailUrl={video.thumbnail}
-                      owner={video.owner}
-                      views={video.view}
-                      createdAt={video.createdAt}
-                      duration={video.duration}
-                      description={video.description}
-                      edit={false}
-                      isPublished={video.isPublished}
-                    />{" "}
-                  </div>
-                ))}
-            </ScrollArea>
-          )}
-        </div>
-      )}
+                </ScrollArea>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

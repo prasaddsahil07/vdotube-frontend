@@ -149,7 +149,6 @@ export default function Navigation() {
               <DropdownMenuItem>
                 <Plus className="mr-2 h-4 w-4" />
                 <span>Contact Me</span>
-                <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
               </DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>
@@ -183,7 +182,6 @@ export default function Navigation() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </div>
         </DropdownMenuContent>
       </DropdownMenu>

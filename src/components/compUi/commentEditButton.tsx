@@ -144,14 +144,13 @@ export default function CommentEditButton({ commentId, comment }: { commentId: s
 
                         <DropdownMenuSeparator />
 
-                        <AlertDialog>
+                        <AlertDialog>c
                             <AlertDialogTrigger className='py-1 pl-2 text-red-600  font-bold text-[15px] rounded'>
                                 <div className="flex justify-center items-center space-x-1">
                                     <Trash className="mr-2 h-4 w-4" />
                                     {
                                         isDeleting ? ' Deleting comment' : ' Delete comment'
                                     }
-                                    <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
                                 </div>
                             </AlertDialogTrigger>
                             <AlertDialogContent>

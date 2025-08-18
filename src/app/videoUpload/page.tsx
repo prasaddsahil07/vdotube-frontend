@@ -107,6 +107,7 @@ export default function VideoUpload() {
 
         // Get token from localStorage as fallback
         const token = user?.accessToken || localStorage.getItem("accessToken");
+        console.log("Access Token: ", token);
 
         try {
             const response = await fetch(process.env.url + '/videos', {

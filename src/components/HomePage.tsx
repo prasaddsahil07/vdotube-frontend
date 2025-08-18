@@ -41,9 +41,7 @@ export default function HomePage() {
         try {
             // Modify this based on your API - assuming it supports pagination
             const response = await getAllPublishedVideos({ 
-                accessToken: user.accessToken,
-                page: pageNum,
-                limit: 10 // Load 10 videos at a time
+                accessToken: user.accessToken
             })
             
             if (response.data && response.data.data) {
@@ -104,7 +102,7 @@ export default function HomePage() {
     }
 
     return (
-        <div className="flex flex-col space-y-8">
+        <div className="flex flex-col space-y-6">
             {/* Header with Search */}
             <div>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">

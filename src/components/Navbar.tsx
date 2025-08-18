@@ -101,7 +101,7 @@ function Navbar() {
                       <Link href="/user/likedVideos">
                         <Button className="flex w-48 pl-8  items-end justify-start space-x-1">
                           <ThumbsUp size={20} />
-                          <p>Like Videos</p>
+                          <p>Liked Videos</p>
                         </Button>
                       </Link>
                     </SheetClose>

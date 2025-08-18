@@ -55,19 +55,17 @@ export default function PlaylistVideo({ videoId, playlistId }: { videoId: string
     if (videoData) {
         ownerId = videoData.owner
     }
-    //   //getting video owner details
+    //getting video owner details
     useEffect(() => {
         const fetchVideoOwner = async () => {
             const response = await getUserByID({ userId: ownerId, accessToken: user.accessToken })
             if (response.status === true) {
-                setOwnerDetails(response.data)
+                setOwnerDetails(response.data.data)
 
             }
             else {
-                console.log(response.data)
+                console.log(response.data.data)
             }
-
-
         }
         if (ownerId) {
             fetchVideoOwner()
@@ -114,7 +112,7 @@ export default function PlaylistVideo({ videoId, playlistId }: { videoId: string
         }
     }
     return (
-        <div className='flex flex-col items-start space-y-2 font-bold text-gray-300'>
+        <div className='flex flex-col items-start space-y-2 font-bold text-gray-600'>
             {
                 videoData && <>
                     <div className='flex'>
@@ -124,7 +122,7 @@ export default function PlaylistVideo({ videoId, playlistId }: { videoId: string
                                 <Image width={320} height={180} className='w-80 h-[180px] rounded-md' src={videoData.thumbnail} alt="Thumbnail" />
                             </div>
 
-                            <span className='bg-black absolute text-white rounded-xl px-2  py-0.5 mb-1 text-[12px] '>
+                            <span className='bg-black absolute text-gray-200 rounded-xl px-2  py-0.5 mb-1 text-[12px] '>
                                 {videoDuration}
                             </span>
                         </Link>
@@ -132,7 +130,7 @@ export default function PlaylistVideo({ videoId, playlistId }: { videoId: string
                             <DropdownMenuTrigger asChild>
                                 <EllipsisVertical />
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-28 px-2 bg-black border-white">
+                            <DropdownMenuContent className="w-28 px-2 text-white bg-black border-white">
                                 <button onClick={handleButtonClick}>Remove Video</button>
 
                             </DropdownMenuContent>
@@ -152,9 +150,9 @@ export default function PlaylistVideo({ videoId, playlistId }: { videoId: string
 
                                 <Link href={`/viewChannel/${ownerDetails?._id}`}>
                                     <div className='flex items-center space-x-1'>
-                                        <h4 className='text-[12px] text-gray-300'> {ownerDetails?.fullName}</h4><p><BadgeCheck size={14} /></p></div>
+                                        <h4 className='text-[12px] text-gray-600'> {ownerDetails?.fullName}</h4><p><BadgeCheck size={14} /></p></div>
                                 </Link>
-                                <div className='text-[11px] flex items-center space-x-2   text-gray-400'>
+                                <div className='text-[11px] flex items-center space-x-2   text-gray-600'>
                                     <p>
                                         {videoData.views} views
                                     </p>

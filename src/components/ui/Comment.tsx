@@ -24,10 +24,11 @@ export default function CommentComponent({ commentId, ownerId, createdAt, commen
         const fetchVideoOwner = async () => {
             const response = await getUserByID({ userId: ownerId, accessToken: user.accessToken })
             if (response.status === true) {
-                setOwnerDetails(response.data)
+                setOwnerDetails(response.data.data)
+                // console.log(response.data.data)
             }
             else {
-                console.log(response.data)
+                console.log(response.data.data)
             }
         }
         if (ownerId) {

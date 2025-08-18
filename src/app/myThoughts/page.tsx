@@ -122,147 +122,211 @@ export default function MyThoughts() {
     };
 
     return (
-        <div className="flex h-screen flex-col pt-12 space-y-20 justify-start items-center">
-            <div className="w-screen flex sm:px-4 justify-around">
-                <div></div>
-                <div className="">
-                    <h1 className="md:text-6xl sm:text-3xl font-bold">
-                        The conversation starts here
-                    </h1>
-                    <h2 className="text-muted-foreground">
-                        Join the platform for Web enthusiasts and access the latest
-                        discussions, news, and insights.
-                    </h2>
+        <div className="min-h-screen pt-20 pb-12">
+            {/* Hero Section */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-16">
+                    {/* Header with Create Button */}
+                    <div className="flex justify-center items-center mb-8">
+                        <div className="flex-1 max-w-4xl">
+                            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+                                The conversation starts here
+                            </h1>
+                            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                                Join the platform for Web enthusiasts and access the latest
+                                discussions, news, and insights.
+                            </p>
+                        </div>
+                        
+                        {/* Floating Create Button */}
+                        <div className="ml-8 flex-shrink-0">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <button className="group relative">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                                        <div className="relative bg-accent hover:bg-accent/80 p-3 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300">
+                                            <Plus size={24} className="text-accent-foreground" />
+                                        </div>
+                                    </button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader className="space-y-4">
+                                        <DialogTitle className="text-xl font-semibold text-center">
+                                            What&apos;s on your mind?
+                                        </DialogTitle>
+                                        <DialogDescription className="text-center text-muted-foreground">
+                                            Share your thoughts with the community
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    
+                                    <form
+                                        className="space-y-6 pt-4"
+                                        onSubmit={handleFormSubmittion}
+                                    >
+                                        <Textarea 
+                                            name="tweet" 
+                                            placeholder="Type your thoughts here..."
+                                            className="min-h-[120px] resize-none"
+                                            required
+                                        />
+
+                                        <div className="flex justify-end">
+                                            {isPosting ? (
+                                                <button
+                                                    disabled
+                                                    className="px-6 py-2.5 bg-gray-400 text-white rounded-lg font-medium animate-pulse cursor-not-allowed"
+                                                >
+                                                    Posting...
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    type="submit"
+                                                    className="px-6 py-2.5 bg-white hover:bg-gray-100 text-black rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md"
+                                                >
+                                                    Post Thought
+                                                </button>
+                                            )}
+                                        </div>
+                                    </form>
+                                    
+                                    <DialogClose asChild>
+                                        <button ref={buttonRef} className="hidden">
+                                            close
+                                        </button>
+                                    </DialogClose>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <Dialog>
-                        <DialogTrigger className="">
-                            {" "}
-                            <Plus
-                                className="bg-accent px-2 hover:-translate-y-1 hover:scale-105 duration-500 rounded-full"
-                                size={40}
-                            />
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle className="text-gray-400">
-                                    What&apos;s on your mind?
-                                </DialogTitle>
 
-                                <form
-                                    className="flex pt-8 flex-col justify-center items-center space-y-4"
-                                    onSubmit={handleFormSubmittion}
+                {/* Content Section */}
+                <div className="max-w-6xl mx-auto">
+                    <Tabs defaultValue="AllTweets" className="w-full">
+                        {/* Enhanced Tabs Header */}
+                        <div className="flex justify-center mb-12">
+                            <TabsList className="bg-gray-900 p-1 rounded-xl shadow-lg border border-gray-700">
+                                <TabsTrigger 
+                                    value="AllTweets" 
+                                    className="px-6 py-3 rounded-lg font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-md"
                                 >
-                                    <Textarea name="tweet" />
+                                    Home
+                                </TabsTrigger>
+                                <TabsTrigger 
+                                    value="YourTweets"
+                                    className="px-6 py-3 rounded-lg font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-md"
+                                >
+                                    Your Thoughts
+                                </TabsTrigger>
+                                <TabsTrigger 
+                                    value="LikedTweets"
+                                    className="px-6 py-3 rounded-lg font-medium transition-all duration-200 data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-md"
+                                >
+                                    Liked Thoughts
+                                </TabsTrigger>
+                            </TabsList>
+                        </div>
 
-                                    {isPosting ? (
-                                        <button
-                                            disabled
-                                            className="px-8 bg-gray-400 rounded-xl animate-pulse  duration-500 text-accent font-bold  py-2 "
-                                        >
-                                            Posting
-                                        </button>
-                                    ) : (
-                                        <button className="px-8 hover:bg-gray-400 rounded-xl duration-500 text-accent font-bold  py-2 bg-white">
-                                            Post
-                                        </button>
-                                    )}
-                                </form>
-                            </DialogHeader>
-                            <DialogClose asChild>
-                                <button ref={buttonRef} className="hidden">
-                                    close
-                                </button>
-                            </DialogClose>
-                        </DialogContent>
-                    </Dialog>
+                        {/* Tabs Content */}
+                        <div className="space-y-8">
+                            <TabsContent value="AllTweets" className="mt-0">
+                                <div className="mb-6">
+                                    <h2 className="text-2xl font-semibold text-white mb-2">Latest Thoughts</h2>
+                                    <p className="text-muted-foreground">Discover what the community is thinking about</p>
+                                </div>
+                                {allTweets && allTweets.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {allTweets
+                                            .slice()
+                                            .reverse()
+                                            .map((tweet: any) => (
+                                                <Tweets
+                                                    key={tweet._id}
+                                                    id={tweet._id}
+                                                    tweet={tweet.content}
+                                                    createdAt={tweet.createdAt}
+                                                    userId={tweet.owner}
+                                                    accessToken={user.accessToken}
+                                                />
+                                            ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-16">
+                                        <div className="text-muted-foreground">
+                                            <p className="text-lg mb-2">No thoughts yet</p>
+                                            <p className="text-sm">Be the first to share your thoughts!</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </TabsContent>
+
+                            <TabsContent value="YourTweets" className="mt-0">
+                                <div className="mb-6">
+                                    <h2 className="text-2xl font-semibold text-white mb-2">Your Thoughts</h2>
+                                    <p className="text-muted-foreground">All the thoughts you&apos;ve shared</p>
+                                </div>
+                                {userTweets && userTweets.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {userTweets
+                                            .slice()
+                                            .reverse()
+                                            .map((tweet: any) => (
+                                                <Tweets
+                                                    key={tweet._id}
+                                                    id={tweet._id}
+                                                    tweet={tweet.content}
+                                                    createdAt={tweet.createdAt}
+                                                    userId={tweet.owner}
+                                                    accessToken={user.accessToken}
+                                                />
+                                            ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-16">
+                                        <div className="text-muted-foreground">
+                                            <p className="text-lg mb-2">You haven&apos;t shared any thoughts yet</p>
+                                            <p className="text-sm">Click the + button to share your first thought!</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </TabsContent>
+
+                            <TabsContent value="LikedTweets" className="mt-0">
+                                <div className="mb-6">
+                                    <h2 className="text-2xl font-semibold text-white mb-2">Liked Thoughts</h2>
+                                    <p className="text-muted-foreground">Thoughts that caught your attention</p>
+                                </div>
+                                {userLikedTweets && userLikedTweets.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {userLikedTweets.map((item: any, index: number) => {
+                                            return item
+                                                .slice()
+                                                .reverse()
+                                                .map((tweet: any) => (
+                                                    <Tweets
+                                                        key={`${tweet._id}-${index}`}
+                                                        id={tweet._id}
+                                                        tweet={tweet.content}
+                                                        createdAt={tweet.createdAt}
+                                                        userId={tweet.owner}
+                                                        accessToken={user.accessToken}
+                                                    />
+                                                ));
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-16">
+                                        <div className="text-muted-foreground">
+                                            <p className="text-lg mb-2">No liked thoughts yet</p>
+                                            <p className="text-sm">Like thoughts you find interesting!</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </TabsContent>
+                        </div>
+                    </Tabs>
                 </div>
             </div>
-            <Tabs defaultValue="AllTweets" className="md:w-5/6  sm:w-[340px] ">
-                <TabsList className="md:w-[800px] mb-8 md:px-8 md:justify-between bg-gray-900 sm:w-[340px]">
-                    <TabsTrigger value="AllTweets">
-                        {" "}
-                        <div className="flex items-center  cursor-pointer">
-                            <p>Home</p>
-                        </div>{" "}
-                    </TabsTrigger>
-                    <TabsTrigger value="YourTweets">
-                        <div className="flex items-center space-x-1  cursor-pointer">
-                            {" "}
-                            <p>Your Thoughts</p>
-                        </div>{" "}
-                    </TabsTrigger>
-                    <TabsTrigger value="LikedTweets">
-                        <div className="flex items-center space-x-1  cursor-pointer">
-                            <p>Liked Thoughts</p>
-                        </div>{" "}
-                    </TabsTrigger>
-                </TabsList>
-                <TabsContent value="AllTweets">
-                    <div className="grid grid-cols-1 md:grid-cols-3  gap-8">
-                        {allTweets && (
-                            <>
-                                {allTweets
-                                    .slice()
-                                    .reverse()
-                                    .map((tweet: any) => (
-                                        <Tweets
-                                            key={tweet._id}
-                                            id={tweet._id}
-                                            tweet={tweet.content}
-                                            createdAt={tweet.createdAt}
-                                            userId={tweet.owner}
-                                            accessToken={user.accessToken}
-                                        />
-                                    ))}
-                            </>
-                        )}
-                    </div>
-                </TabsContent>
-                <TabsContent value="YourTweets">
-                    <div className="grid grid-cols-1 md:grid-cols-3  gap-8">
-                        {userTweets && (
-                            <>
-                                {userTweets
-                                    .slice()
-                                    .reverse()
-                                    .map((tweet: any) => (
-                                        <Tweets
-                                            key={tweet._id}
-                                            id={tweet._id}
-                                            tweet={tweet.content}
-                                            createdAt={tweet.createdAt}
-                                            userId={tweet.owner}
-                                            accessToken={user.accessToken}
-                                        />
-                                    ))}
-                            </>
-                        )}
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="LikedTweets">
-                    {userLikedTweets && (
-                        <div className="grid grid-cols-1 md:grid-cols-3  gap-8">
-                            {userLikedTweets.map((item: any) => {
-                                return item
-                                    .slice()
-                                    .reverse()
-                                    .map((tweet: any) => (
-                                        <Tweets
-                                            key={tweet._id}
-                                            id={tweet._id}
-                                            tweet={tweet.content}
-                                            createdAt={tweet.createdAt}
-                                            userId={tweet.owner}
-                                            accessToken={user.accessToken}
-                                        />
-                                    ));
-                            })}
-                        </div>
-                    )}
-                </TabsContent>
-            </Tabs>
         </div>
     );
 }
