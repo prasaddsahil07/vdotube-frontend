@@ -13,7 +13,6 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
@@ -109,7 +108,6 @@ export function VideoEditButton({ videoId, isPublished }: { videoId: string, isP
                                     {
                                         isDeleting ? ' Deleting Video' : ' Delete Video'
                                     }
-                                    <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
                                 </div>
                             </AlertDialogTrigger>
                             <AlertDialogContent>

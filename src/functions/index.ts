@@ -87,6 +87,7 @@ export async function LikeTweet({ tweetId, accessToken }: { tweetId: string, acc
 
     if (response.ok) {
         const res_data = await response.json()
+        console.log("response: ", res_data);
         return res_data
     }
     else {
@@ -303,6 +304,8 @@ export async function getUserByID({ userId, accessToken }: { userId: any, access
 
     })
 
+    console.log("UID: ", userId);
+
     // console.log("Printing ok: ", response.ok);
     // console.log("Printing code: ", response.status);
     if (response.ok) {
@@ -385,6 +388,8 @@ export async function getUserLikedTweets({ accessToken }: { accessToken: string 
         credentials: 'include'
 
     })
+
+    console.log("Details: ", response);
 
     if (response.ok) {
         const data = await response.json()

@@ -153,7 +153,6 @@ export function TweetEditButton({ tweetId, tweet }: { tweetId: string, tweet: st
                                     {
                                         isDeleting ? ' Deleting Tweet' : ' Delete Tweet'
                                     }
-                                    <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
                                 </div>
                             </AlertDialogTrigger>
                             <AlertDialogContent>

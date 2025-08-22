@@ -105,6 +105,7 @@ export default function MyThoughts() {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(tweet),
+            credentials: 'include'
         });
 
         if (response.ok) {
@@ -119,10 +120,12 @@ export default function MyThoughts() {
         setIsPosting(false);
     };
 
+    // console.log("User liked tweets: ", userLikedTweets);
+
     return (
         <div className="min-h-screen bg-background">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
-                
+
                 {/* Clean Header Section */}
                 <div className="mb-8">
                     <div className="flex items-center justify-between mb-6">
@@ -130,7 +133,7 @@ export default function MyThoughts() {
                             <h1 className="text-3xl font-bold text-foreground mb-2">My Thoughts</h1>
                             <p className="text-muted-foreground">Share and explore ideas with the community</p>
                         </div>
-                        
+
                         {/* Simple Create Button */}
                         <Dialog>
                             <DialogTrigger asChild>
@@ -146,10 +149,10 @@ export default function MyThoughts() {
                                         What's on your mind today?
                                     </DialogDescription>
                                 </DialogHeader>
-                                
+
                                 <form className="space-y-4 mt-4" onSubmit={handleFormSubmittion}>
-                                    <Textarea 
-                                        name="tweet" 
+                                    <Textarea
+                                        name="tweet"
                                         placeholder="Share what you're thinking about..."
                                         className="min-h-[100px] resize-none border-input"
                                         required
@@ -172,7 +175,7 @@ export default function MyThoughts() {
                                                 Posting...
                                             </button>
                                         ) : (
-                                            <button 
+                                            <button
                                                 type="submit"
                                                 className="px-6 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg font-medium transition-colors duration-200"
                                             >
@@ -181,7 +184,7 @@ export default function MyThoughts() {
                                         )}
                                     </div>
                                 </form>
-                                
+
                                 <DialogClose asChild>
                                     <button ref={buttonRef} className="hidden">
                                         close
@@ -196,21 +199,21 @@ export default function MyThoughts() {
                 <Tabs defaultValue="AllTweets" className="w-full">
                     <div className="mb-8">
                         <TabsList className="grid w-full grid-cols-3 bg-muted p-1 rounded-lg">
-                            <TabsTrigger 
-                                value="AllTweets" 
+                            <TabsTrigger
+                                value="AllTweets"
                                 className="flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all duration-200 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                             >
                                 <Home size={16} />
                                 All Thoughts
                             </TabsTrigger>
-                            <TabsTrigger 
+                            <TabsTrigger
                                 value="YourTweets"
                                 className="flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all duration-200 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                             >
                                 <User size={16} />
                                 Your Thoughts
                             </TabsTrigger>
-                            <TabsTrigger 
+                            <TabsTrigger
                                 value="LikedTweets"
                                 className="flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all duration-200 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                             >
@@ -232,7 +235,7 @@ export default function MyThoughts() {
                                     {allTweets?.length || 0} thoughts shared by the community
                                 </p>
                             </div>
-                            
+
                             {allTweets && allTweets.length > 0 ? (
                                 <div className="space-y-4">
                                     {allTweets
@@ -269,7 +272,7 @@ export default function MyThoughts() {
                                     {userTweets?.length || 0} thoughts you've shared
                                 </p>
                             </div>
-                            
+
                             {userTweets && userTweets.length > 0 ? (
                                 <div className="space-y-4">
                                     {userTweets
@@ -306,10 +309,10 @@ export default function MyThoughts() {
                                                     What would you like to share with the community?
                                                 </DialogDescription>
                                             </DialogHeader>
-                                            
+
                                             <form className="space-y-4 mt-4" onSubmit={handleFormSubmittion}>
-                                                <Textarea 
-                                                    name="tweet" 
+                                                <Textarea
+                                                    name="tweet"
                                                     placeholder="Share what you're thinking about..."
                                                     className="min-h-[100px] resize-none"
                                                     required
@@ -323,7 +326,7 @@ export default function MyThoughts() {
                                                             Cancel
                                                         </button>
                                                     </DialogClose>
-                                                    <button 
+                                                    <button
                                                         type="submit"
                                                         className="px-6 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg font-medium transition-colors duration-200"
                                                         disabled={isPosting}
@@ -348,27 +351,25 @@ export default function MyThoughts() {
                                     Thoughts that resonated with you
                                 </p>
                             </div>
-                            
+
                             {userLikedTweets && userLikedTweets.length > 0 ? (
                                 <div className="space-y-4">
-                                    {userLikedTweets.map((item: any, index: number) => {
-                                        return item
-                                            .slice()
-                                            .reverse()
-                                            .map((tweet: any) => (
-                                                <div key={`${tweet._id}-${index}`} className="bg-card border border-border rounded-lg p-1 hover:shadow-sm transition-shadow duration-200">
-                                                    <Tweets
-                                                        id={tweet._id}
-                                                        tweet={tweet.content}
-                                                        createdAt={tweet.createdAt}
-                                                        userId={tweet.owner}
-                                                        accessToken={user.accessToken}
-                                                    />
-                                                </div>
-                                            ));
-                                    })}
+                                    {userLikedTweets
+                                        .slice()
+                                        .reverse()
+                                        .map((tweet: any) => (
+                                            <div key={tweet._id} className="bg-card border border-border rounded-lg p-1 hover:shadow-sm transition-shadow duration-200">
+                                                <Tweets
+                                                    id={tweet._id}
+                                                    tweet={tweet.content}
+                                                    createdAt={tweet.createdAt}
+                                                    userId={tweet.owner}
+                                                    accessToken={user.accessToken}
+                                                />
+                                            </div>
+                                        ))}
                                 </div>
-                            ) : (
+                            )  : (
                                 <div className="text-center py-12 bg-card border border-border rounded-lg">
                                     <Heart size={48} className="mx-auto mb-4 text-muted-foreground/50" />
                                     <h3 className="text-lg font-medium text-foreground mb-2">No liked thoughts yet</h3>

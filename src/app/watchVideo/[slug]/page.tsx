@@ -16,7 +16,7 @@ import {
 } from "@/functions";
 import { ThumbsDown, ThumbsUp, ChevronDown, ChevronUp } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, use } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Accordion,
@@ -64,8 +64,10 @@ type MyData = {
   // Add any other properties if needed
 };
 
-export default function ViewVideo({ params }: { params: { slug: any } }) {
-  const videoId = params.slug;
+export default function ViewVideo({ params }: { params: Promise<{ slug: any }> }) {
+  // Properly unwrap params using React.use()
+  const resolvedParams = use(params);
+  const videoId = resolvedParams.slug;
 
   const [videoData, setVideoData] = useState<VideoData>();
   const [liked, setLiked] = useState(false);
@@ -75,6 +77,7 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
   const [channelStats, setChannelStats] = useState<MyData>();
   const [ownerDetails, setOwnerDetails] = useState<any>();
   const [showRecommended, setShowRecommended] = useState(false);
+  const [isLiking, setIsLiking] = useState(false); // Add loading state for like button
   const data = useSelector((state: any) => state.user);
   const user = data.user[0];
   const dispatch = useDispatch();
@@ -100,10 +103,11 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
         console.log(response.status);
       }
     };
-    if (user) {
+    if (user && videoId) {
       fetchVideo();
     }
   }, [videoId, user]);
+  
   let ownerId: any;
 
   if (videoData) {
@@ -128,21 +132,32 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
   //checking if user already liked the video or not
   useEffect(() => {
     const checkLike = async () => {
-      const response = await checkLiked({
-        accessToken: user.accessToken,
-        id: videoId,
-      });
+      try {
+        const response = await checkLiked({
+          accessToken: user.accessToken,
+          id: videoId,
+        });
 
-      if (response?.liked === true) {
-        const data = response.data;
-        setLiked(data.liked);
-      } else {
+        console.log('checkLiked response for video:', videoId, response); // Debug log
+
+        // Handle the response properly
+        if (response && typeof response.liked === 'boolean') {
+          setLiked(response.liked);
+        } else if (response && response.data && typeof response.data.liked === 'boolean') {
+          setLiked(response.data.liked);
+        } else {
+          setLiked(false);
+        }
+      } catch (error) {
+        console.error('Error checking like status:', error);
         setLiked(false);
       }
     };
 
-    checkLike();
-  }, [videoId, user]);
+    if (videoId && user?.accessToken) {
+      checkLike();
+    }
+  }, [videoId, user?.accessToken]);
 
   //checking if user already subscribed?
   useEffect(() => {
@@ -227,14 +242,42 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
       }
     };
 
-    if (user) {
+    if (user && videoId) {
       getVideoComments();
     }
   }, [user, videoId]);
 
+  // Fixed like button handler - similar to tweet like logic
   const handleLikeButton = async () => {
-    setLiked(!liked);
-    await LikeVideo({ videoId: videoId, accessToken: user.accessToken });
+    if (isLiking) return; // Prevent multiple requests
+    
+    setIsLiking(true);
+    
+    try {
+      const response = await LikeVideo({ 
+        videoId: videoId, 
+        accessToken: user.accessToken 
+      });
+      
+      console.log('LikeVideo response:', response); // Debug log
+      
+      // Check if response exists and has the liked property
+      if (response && typeof response.liked === 'boolean') {
+        // Use the actual response from backend instead of optimistic update
+        setLiked(response.liked);
+        console.log(response.liked ? 'Video liked successfully' : 'Video unliked successfully');
+      } else {
+        console.error('Invalid response from like API:', response);
+        // Don't change the state if we get an invalid response
+      }
+      
+      dispatch(userActions.isChanged({}));
+    } catch (error) {
+      // Don't change state on error, keep current state
+      console.error('Error liking video:', error);
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   const handleSubscribeButton = async () => {
@@ -379,22 +422,22 @@ export default function ViewVideo({ params }: { params: { slug: any } }) {
                   <div className="flex items-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors overflow-hidden">
                     <button
                       onClick={handleLikeButton}
-                      className="flex items-center space-x-2 px-4 py-2.5 hover:bg-gray-300 transition-colors"
+                      disabled={isLiking}
+                      className="flex items-center space-x-2 px-4 py-2.5 hover:bg-gray-300 transition-colors disabled:opacity-50"
                     >
                       <ThumbsUp
                         size={20}
                         color={liked ? "#ff4444" : "#374151"}
                         fill={liked ? "#ff4444" : "none"}
                       />
-                      <span className="text-gray-800 font-medium">Like</span>
+                      <span className="text-gray-800 font-medium">
+                        {isLiking ? "Loading..." : "Like"}
+                      </span>
                     </button>
 
                     <div className="w-px h-6 bg-gray-300"></div>
 
-                    <button
-                      onClick={handleLikeButton}
-                      className="flex items-center px-4 py-2.5 hover:bg-gray-300 transition-colors"
-                    >
+                    <button className="flex items-center px-4 py-2.5 hover:bg-gray-300 transition-colors">
                       <ThumbsDown size={20} color="#374151" />
                     </button>
                   </div>
