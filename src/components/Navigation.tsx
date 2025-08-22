@@ -92,7 +92,6 @@ export default function Navigation() {
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
                 <span className="text-[13px]">{user.fullName}</span>
-                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
               </DropdownMenuItem>
             </Link>
             <Link href="/myThoughts">
@@ -104,13 +103,11 @@ export default function Navigation() {
             <DropdownMenuItem>
               <CreditCard className="mr-2 h-4 w-4" />
               <div onClick={healthCheck}>Health Checkup</div>
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
             </DropdownMenuItem>
             <Link href="/channelStats">
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Channel Stats</span>
-                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
               </DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>
@@ -122,11 +119,11 @@ export default function Navigation() {
                 <span>Invite users</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
-                <DropdownMenuSubContent className="bg-black">
+                <DropdownMenuSubContent className="bg-white">
                   <DropdownMenuItem>
                     <Link
                       className="flex"
-                      href="mailto:anujchhikara777@gmail.com"
+                      href="prasadsahil41@gmail.com"
                     >
                       {" "}
                       <Mail className="mr-2 h-4 w-4" />
@@ -152,16 +149,6 @@ export default function Navigation() {
               </DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem>
-            <LifeBuoy className="mr-2 h-4 w-4" />
-            <span>Support</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled>
-            <Cloud className="mr-2 h-4 w-4" />
-            <span>API</span>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <div className="flex justify-center items-center px-3">
             <LogOut className="mr-2 h-4 w-4" />

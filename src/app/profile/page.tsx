@@ -65,7 +65,8 @@ export default function UserProfile() {
                     method: 'Get',
                     headers: {
                         'Authorization': `Bearer ${user.accessToken}`
-                    }
+                    },
+                    credentials: 'include',
                 })
 
                 if (response.ok) {

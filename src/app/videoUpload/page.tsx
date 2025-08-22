@@ -115,8 +115,11 @@ export default function VideoUpload() {
                 headers: {
                     'Authorization': `Bearer ${user.accessToken}`
                 },
-                body: formData
+                body: formData,
+                credentials: 'include',
             })
+
+            console.log("printing response: ", response);
 
             if (response.ok) {
                 const res_data = await response.json()
