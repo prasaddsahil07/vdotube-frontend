@@ -8,10 +8,9 @@ import Video from "./video"
 
 export default function HomePage() {
     const [videosData, setVideosData] = useState<any[]>([])
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true) // Start with loading true
     const [hasMore, setHasMore] = useState(true)
     const [page, setPage] = useState(1)
-    const [initialLoad, setInitialLoad] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
     
     const userData = useSelector((state: any) => state.user)
@@ -33,15 +32,16 @@ export default function HomePage() {
         setSearchQuery("")
     }
 
-    // Initial load of videos
+    // Fetch videos function
     const fetchVideos = useCallback(async (pageNum: number = 1, reset: boolean = false) => {
-        if (loading) return
+        if (!user?.accessToken) return
         
-        setLoading(true)
+        // Only set loading for additional pages, not initial load
+        if (!reset) setLoading(true)
         
         try {
             const response = await getAllPublishedVideos({ 
-                accessToken: user?.accessToken
+                accessToken: user.accessToken
             })
             
             if (response.data && response.data.data) {
@@ -53,49 +53,38 @@ export default function HomePage() {
                     setVideosData(prev => [...prev, ...newVideos])
                 }
                 
-                // Check if there are more videos to load
-                setHasMore(newVideos.length === 12) // If we got less than 12, no more videos
+                setHasMore(newVideos.length === 12)
             }
         } catch (error) {
             console.error('Error fetching videos:', error)
         } finally {
             setLoading(false)
-            setInitialLoad(false)
         }
-    }, [user?.accessToken, loading])
+    }, [user?.accessToken])
 
-    // Initial load with proper dependency handling
+    // Single useEffect to handle video fetching
     useEffect(() => {
-        // Only fetch if we have a user with accessToken and haven't loaded yet
-        if (user?.accessToken && initialLoad) {
+        if (user?.accessToken) {
             fetchVideos(1, true)
+        } else {
+            setLoading(false)
         }
-    }, [user?.accessToken, initialLoad, fetchVideos])
-
-    // Additional effect to handle user state changes after login
-    useEffect(() => {
-        // If user just logged in and we don't have videos yet, fetch them
-        if (user?.accessToken && videosData.length === 0 && !loading && !initialLoad) {
-            setInitialLoad(true)
-            fetchVideos(1, true)
-        }
-    }, [user?.accessToken, videosData.length, loading, initialLoad, fetchVideos])
+    }, [user?.accessToken, fetchVideos])
 
     // Infinite scroll handler
     const handleScroll = useCallback(() => {
-        if (loading || !hasMore) return
+        if (loading || !hasMore || !user?.accessToken) return
 
         const scrollTop = document.documentElement.scrollTop
         const scrollHeight = document.documentElement.scrollHeight
         const clientHeight = document.documentElement.clientHeight
 
-        // Load more when user is 200px from bottom
         if (scrollTop + clientHeight >= scrollHeight - 200) {
             const nextPage = page + 1
             setPage(nextPage)
             fetchVideos(nextPage, false)
         }
-    }, [loading, hasMore, page, fetchVideos])
+    }, [loading, hasMore, page, fetchVideos, user?.accessToken])
 
     // Add scroll event listener
     useEffect(() => {
@@ -103,11 +92,12 @@ export default function HomePage() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [handleScroll])
 
-    if (initialLoad && loading) {
+    // Show loading screen only when initially loading and no videos yet
+    if (loading && videosData.length === 0) {
         return (
-            <div className="flex justify-center items-center min-h-screen w-full">
-                <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div className="min-h-screen w-full flex justify-center items-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
                     <p className="mt-3 text-gray-600">Loading videos...</p>
                 </div>
             </div>
@@ -115,13 +105,13 @@ export default function HomePage() {
     }
 
     return (
-        <div className="flex flex-col space-y-6 w-full">
-            {/* Header with Search */}
-            <div className="w-full">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 px-4 sm:px-0">
+        <div className="min-h-screen w-full">
+            <div className="max-w-7xl mx-auto px-4 py-6">
+                {/* Header with Search */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <div>
-                        <h2 className="md:text-4xl sm:text-3xl text-2xl font-bold">Latest Videos</h2>
-                        <p className="md:text-sm sm:text-[12px] text-xs text-gray-600 mt-1">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Latest Videos</h2>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1">
                             Discover amazing content from our community
                         </p>
                     </div>
@@ -131,7 +121,7 @@ export default function HomePage() {
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                             type="text"
-                            placeholder="Search videos by title or description..."
+                            placeholder="Search videos..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -149,7 +139,7 @@ export default function HomePage() {
 
                 {/* Search Results Info */}
                 {searchQuery && (
-                    <div className="mb-4 text-sm text-gray-600 px-4 sm:px-0">
+                    <div className="mb-6 text-sm text-gray-600">
                         {filteredVideos.length > 0 ? (
                             <p>Found {filteredVideos.length} video{filteredVideos.length !== 1 ? 's' : ''} matching "{searchQuery}"</p>
                         ) : (
@@ -158,12 +148,11 @@ export default function HomePage() {
                     </div>
                 )}
                 
-                {/* Videos Grid - Fixed centering issue */}
-                <div className="w-full px-4 sm:px-0">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch">
-                        {filteredVideos.map((video: any) => (
+                {/* Videos Grid - Properly centered */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+                    {filteredVideos.map((video: any) => (
+                        <div key={video._id} className="w-full max-w-sm">
                             <Video
-                                key={video._id}
                                 videoId={video._id}
                                 title={video.title}
                                 videoUrl={video.videoFile}
@@ -176,46 +165,47 @@ export default function HomePage() {
                                 edit={false}
                                 isPublished={video.isPublished}
                             />
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
 
-                {/* Loading Indicator - Fixed centering */}
-                {loading && !initialLoad && (
-                    <div className="flex justify-center items-center py-8 w-full">
-                        <div className="flex items-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                            <span className="ml-3 text-gray-600">Loading more videos...</span>
+                {/* Loading More Indicator */}
+                {loading && videosData.length > 0 && (
+                    <div className="w-full flex justify-center items-center py-8">
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                            <span className="mt-2 text-gray-600 text-sm">Loading more videos...</span>
                         </div>
                     </div>
                 )}
 
-                {/* No More Videos Message - Only show when not searching */}
+                {/* No More Videos */}
                 {!searchQuery && !hasMore && videosData.length > 0 && (
-                    <div className="text-center py-8 text-gray-500 w-full">
+                    <div className="text-center py-8 text-gray-500">
                         You've reached the end! No more videos to load.
                     </div>
                 )}
 
-                {/* No Videos Found */}
-                {!loading && filteredVideos.length === 0 && !searchQuery && (
-                    <div className="text-center py-16 w-full">
-                        <h3 className="text-xl font-medium text-gray-700 mb-2">No videos found</h3>
-                        <p className="text-gray-500">Be the first to upload a video!</p>
-                    </div>
-                )}
-
-                {/* No Search Results */}
-                {searchQuery && filteredVideos.length === 0 && !loading && (
-                    <div className="text-center py-16 w-full">
-                        <h3 className="text-xl font-medium text-gray-700 mb-2">No videos match your search</h3>
-                        <p className="text-gray-500">Try searching with different keywords</p>
-                        <button 
-                            onClick={clearSearch}
-                            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                        >
-                            Clear Search
-                        </button>
+                {/* Empty States */}
+                {!loading && filteredVideos.length === 0 && (
+                    <div className="text-center py-16">
+                        {searchQuery ? (
+                            <>
+                                <h3 className="text-xl font-medium text-gray-700 mb-2">No videos match your search</h3>
+                                <p className="text-gray-500 mb-4">Try searching with different keywords</p>
+                                <button 
+                                    onClick={clearSearch}
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                >
+                                    Clear Search
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <h3 className="text-xl font-medium text-gray-700 mb-2">No videos found</h3>
+                                <p className="text-gray-500">Be the first to upload a video!</p>
+                            </>
+                        )}
                     </div>
                 )}
             </div>
